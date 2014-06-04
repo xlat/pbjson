@@ -1,0 +1,8 @@
+Save Format v3.0(19990112)
+@begin Unchecked
+@end;
+@begin Targets
+ 0 "json_test_app.pbt";
+@end;
+DefaultTarget "json_test_app.pbt";
+DefaultRemoteTarget "json_test_app.pbt";
