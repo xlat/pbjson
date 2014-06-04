@@ -1,0 +1,14 @@
+TODO
+====
+
+    - test Unicode escaped chars
+    - check for incomplete parse (truncated data)
+    - add json.deleteAttribute(as_name)
+    - add json.deleteElement(index)
+
+Improving performance:
+    - try to use indexed char[i] rather than mid() for as_json in parse(as_json),
+    in order to reduce parse time in pb90 (and possibliy newer). 
+    - use a c implementation of json parser.
+    - review string concatenations by using fastfunc
+    - change pseudo-hash with a real hash algo for json object attributes
