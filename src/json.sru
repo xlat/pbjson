@@ -1,6 +1,6 @@
 HA$PBExportHeader$json.sru
 forward
-global type json from nonvisualobject
+global type json from internetresult
 end type
 type json_pair from structure within json
 end type
@@ -25,7 +25,7 @@ shared variables
 string ss_dec_sep, ss_dec_not_sep
 end variables
 
-global type json from nonvisualobject
+global type json from internetresult
 end type
 global json json
 
@@ -35,6 +35,7 @@ private:
 	json_pair pairs[]
 	string pair_index
 	string parsed_string
+	blob ibl_data			//for retrieve data from url
 end variables
 
 forward prototypes
@@ -84,6 +85,10 @@ public function string tojson (any value)
 public function string tojson ()
 public function string parseurl (readonly string as_url)
 public function string parsefile (readonly string as_filename)
+public function integer internetdata (blob data)
+public function string getstringdata ()
+public function blob getdata ()
+public function string getstringdata (encoding encodingtype)
 end prototypes
 
 public function string parse (readonly string as_json);//Parse as_json as a json input and fill current object to reflect parsed structure
@@ -610,15 +615,11 @@ end function
 public function string parseurl (readonly string as_url);string ls_json
 inet linet
 if getContextservice( "internet", ref linet) = 1 then
-	json_inetdata linetdata
-	linetdata = create json_inetdata
-	if linet.getUrl( as_url, ref linetdata ) = 1 then
-		ls_json = linetdata.getStringdata( )
-		destroy linetdata
+	if linet.getUrl( as_url, this ) = 1 then
+		ls_json = this.getStringdata( )
 		destroy linet
 		return parse( ls_json )
 	end if
-	destroy linetdata
 end if
 destroy linet
 return "Error retrieving url"
@@ -641,6 +642,19 @@ else
 	ls_error = "Error reading file"
 end if
 return ls_error
+end function
+
+public function integer internetdata (blob data);ibl_data = data
+return 1
+end function
+
+public function string getstringdata ();return string( ibl_data, encodingansi! )
+end function
+
+public function blob getdata ();return ibl_data
+end function
+
+public function string getstringdata (encoding encodingtype);return string( ibl_data, encodingtype )
 end function
 
 on json.create
