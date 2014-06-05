@@ -22,8 +22,8 @@ goto end:
 
 :ok
 echo Done. 
-copy /Y *.pbl .. 1>null
-copy /Y *.pbt .. 1>null
+copy /Y *.pbl .. 1>nul
+copy /Y *.pbt .. 1>nul
 cd ..
 echo *.pbl files should have been copied in the project directory.
 
