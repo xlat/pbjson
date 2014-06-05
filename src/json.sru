@@ -55,7 +55,6 @@ public function boolean isnumber ()
 public function boolean isobject ()
 public function boolean isarray ()
 public function boolean isbool ()
-public function string tostring (readonly string str)
 public function boolean isarray (readonly any value)
 public function boolean isbool (readonly any value)
 public function boolean isnumber (any value)
@@ -89,6 +88,7 @@ public function integer internetdata (blob data)
 public function string getstringdata ()
 public function blob getdata ()
 public function string getstringdata (encoding encodingtype)
+public function string tostring (readonly character str[])
 end prototypes
 
 public function string parse (readonly string as_json);//Parse as_json as a json input and fill current object to reflect parsed structure
@@ -125,7 +125,7 @@ for i = 1 to size
 	if sidx<1 then sidx=1//to consume trailing whitespaces
 	if states[sidx].state<>STATE_STR then
 		//skip whitechars
-		if c=' ' or c='~r' or c='~n' or c='~t' then
+		if c=' ' or c='~r' or c='~n' or c='~t' or c='~b' or c='~f' then
 			continue
 		end if
 	end if
@@ -216,6 +216,7 @@ for i = 1 to size
 			choose case c
 				case '"'
 					if ignore_next then
+						ignore_next = false
 						str += string(c)
 					else
 						value = str
@@ -223,7 +224,12 @@ for i = 1 to size
 					end if
 				case '\'
 					//ignore char
-					ignore_next = true
+					if ignore_next then
+						ignore_next = false
+						str += string(c)
+					else
+						ignore_next = true
+					end if
 				case else
 					if ignore_next then
 						ignore_next = false
@@ -249,8 +255,13 @@ for i = 1 to size
 								else
 									return error(as_json,i,"unexpected token")
 								end if
-							case /*'"',*/ '\', '/', 'b', 'f', 'n', 'r', 't'
+							case /*'"',*/ '\', '/'
 								str += string(c)
+							case 'b' ; str += "~b"
+							case 'f' ; str += "~f"
+							case 'n' ; str += "~n"
+							case 'r' ; str += "~r"
+							case 't' ; str += "~t"
 							case else
 								return error(as_json,i,"unexpected token")
 						end choose
@@ -401,13 +412,6 @@ public function boolean isarray ();return classname(ia_value)='any'
 end function
 
 public function boolean isbool ();return classname(ia_value)='boolean'
-end function
-
-public function string tostring (readonly string str);//format a string to json string format
-string ls_string
-//TODO: does not handle \u, \r, \n, etc... chars : need to use pos/mid/replace...
-ls_string = '"'+str+'"'
-return ls_string
 end function
 
 public function boolean isarray (readonly any value);return classname(value)='any'
@@ -655,6 +659,34 @@ public function blob getdata ();return ibl_data
 end function
 
 public function string getstringdata (encoding encodingtype);return string( ibl_data, encodingtype )
+end function
+
+public function string tostring (readonly character str[]);//format a string to json string format
+char ls_string[], c
+long s, size, t = 1
+size = upperbound(str[])
+ls_string[size+1] = char(0)	//preallocate array (may have additional growing for \)
+ls_string[t]='"' ; t++
+for s = 1 to size
+	c = str[s]
+	choose case c
+		case  '/' ; ls_string[t] = '\'; ls_string[t+1] = '/'; t++
+		case  '\' ; ls_string[t] = '\'; ls_string[t+1] = '\'; t++
+		case  '"' ; ls_string[t] = '\'; ls_string[t+1] = '"'; t++
+		case "~n" ; ls_string[t] = '\'; ls_string[t+1] = 'n'; t++
+		case "~r" ; ls_string[t] = '\'; ls_string[t+1] = 'r'; t++
+		case "~t" ; ls_string[t] = '\'; ls_string[t+1] = 't'; t++
+		case "~b" ; ls_string[t] = '\'; ls_string[t+1] = 'b'; t++
+		case "~f" ; ls_string[t] = '\'; ls_string[t+1] = 'f'; t++
+		case else
+			//does not handle \uXXXX generation; don't know unicode ranges that should apply.
+			ls_string[t] = c
+	end choose
+	t++
+next
+ls_string[t]='"'
+ls_string[t+1]=char(0)
+return string(ls_string[])
 end function
 
 on json.create
