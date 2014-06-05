@@ -1,0 +1,34 @@
+; This script can reconstruct the project pbl after a git update
+
+set targetFile = targetname
+set targetFile += ".pbt" 
+set logfilename = "rebuild_"
+set logfilename += targetname
+set logfilename += ".log"
+
+
+start session
+
+scc set connect property logfile logfilename
+scc set connect property logappend false
+
+scc set connect property localprojpath ".\" 
+
+;do not actually connect through source control
+;just get the sources files from the current directory
+scc connect offline
+
+scc set target targetFile refresh_all importonly
+
+;a mentioned pbl/pbd must be in library list / target
+;scc exclude liblist "pbnihash.pbd"
+
+;If you're trying to recreate the PBLs from source, you should use the 
+;migrate option rather than full.  That lets ORCAScript know that it needs to 
+;be able to deal with missing ancestors during import.
+;scc refresh target full
+scc refresh target migrate
+
+scc close
+
+end session
