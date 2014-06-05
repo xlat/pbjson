@@ -3,31 +3,44 @@ README
 
 JSON for PowerBuilder classic, a JSON implementation in pure PowerBuilder.
 
+PREREQUIRE
+==========
+
+PB10+, the test project was tested using PB11.5 and the bootstrap-pbl.cmd 
+initialisation files is configurated for PB115, to switch to another IDE 
+version, edit this file and change the line containing "set pbver=115" by
+the appropriate value.
+
 INSTALLATION
 ============
 
-Import src/json.sru and src/json_inetdata.sru files into your project.
+* run bootstrap-pbl.cmd 
+* open the workspace json.pbw in pbide
 
 SYNOPSIS
 ========
 
+```
 json ln_json
 ln_json = create json
 string ls_error
 ls_error = ln_json.parseURL("http://date.jsontest.com")
-//or 
-//ls_error = ln_json.parseURL('{                &
-//   "time": "07:30:18 PM",                     &
-//   "milliseconds_since_epoch": 1401910218155, &
-//   "date": "06-04-2014"                       &
-//}')
-//or
-//ls_error = ln_json.parseFile('c:\fixtures\json\test-date.json')
 if ls_error = "" then
     messagebox("date", ln_json.retrieve("date") )
 end if
 destroy ln_json
 
+//or
+
+ls_error = ln_json.parse('{                &
+   "time": "07:30:18 PM",                     &
+   "milliseconds_since_epoch": 1401910218155, &
+   "date": "06-04-2014"                       &
+}')
+
+//or
+ls_error = ln_json.parseFile('c:\fixtures\json\test-date.json')
+```
 LICENSE
 =======
 
