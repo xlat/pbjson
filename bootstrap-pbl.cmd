@@ -6,7 +6,7 @@ del /Q /F *.pbl
 cd src
 
 set target=json_test_app
-set pbver=115
+set pbver=170
 
 echo Rebuild the pbl from sources
 echo.

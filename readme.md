@@ -2,6 +2,8 @@ README
 ======
 
 JSON for PowerBuilder classic, a JSON implementation in pure PowerBuilder.
+Parsers accepts an ab_relaxed Boolean parameter to allow a superset of JSON 
+that include single quoted string and comments (inline and stream).
 
 PREREQUIRE
 ==========
@@ -9,7 +11,7 @@ PREREQUIRE
 PB10+, the test project was tested using PB11.5 and the bootstrap-pbl.cmd 
 initialisation files is configurated for PB115, to switch to another IDE 
 version, edit this file and change the line containing "set pbver=115" by
-the appropriate value.
+the appropriate value (100, 110, 115, 120, 125, 170).
 
 INSTALLATION
 ============
