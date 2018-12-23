@@ -5,6 +5,7 @@ JSON for PowerBuilder classic, a JSON implementation in pure PowerBuilder.
 Parsers accepts an ab_relaxed Boolean parameter to allow a superset of JSON 
 that include single quoted string and comments (inline and stream).
 
+
 PREREQUIRE
 ==========
 
@@ -23,26 +24,87 @@ SYNOPSIS
 ========
 
 ```
+//First, create a JSON parser
 json ln_json
 ln_json = create json
 string ls_error
+
+/*
+//to read from an URL
 ls_error = ln_json.parseURL("http://date.jsontest.com")
-if ls_error = "" then
-    messagebox("date", ln_json.retrieve("date") )
-end if
-destroy ln_json
+*/
 
-//or
+/*
+//to read from a file
+ls_error = ln_json.parseFile('c:\fixtures\json\test-date.json')
+*/
 
-ls_error = ln_json.parse('{                &
+//to read from string
+ls_error = ln_json.parse('{                   &
    "time": "07:30:18 PM",                     &
    "milliseconds_since_epoch": 1401910218155, &
-   "date": "06-04-2014"                       &
+   "date": "06-04-2014",                       &
+   "person": {        &
+	    "name":  "Nicolas", &
+		 "age": 39, &
+		 "languages": [ "fr", "en" ], &
+	}       &
 }')
 
-//or
-ls_error = ln_json.parseFile('c:\fixtures\json\test-date.json')
+//check for parse error
+if ls_error <> "" then
+	messagebox("Parse error", ls_error, stopSign!, ok!)
+	destroy ln_json
+	return
+end if
+
+//working with parsed data
+ any la_data
+ if ln_json.retrieve("date", ref la_data) then
+	  messagebox("date", string(la_data))
+ end if
+
+//using XPath like expression to travers JSON structures : object with key name, array with index (1 based)
+ if ln_json.retrieve("person/languages/2", ref la_data) then
+	  messagebox("Person language n#2", string(la_data))
+ end if
+
+//using OOP
+la_data = ln_json.getObject().getAttribute( "date" )
+messagebox("date", string(la_data))
+
+//then destroy parser
+destroy ln_json
+
+//TODO: add an Update method that works with an XPath-like expression to modify an element
+//			add a Delete method that works with an XPath-like expression to delete an element
+//Build a JSON structure
+//Don't need a `ln_json.reset()` 'cause setObject will change the root
+json ln_root, ln_person, ln_languages
+ln_root = create json
+ln_person = create json
+ln_person.setattribute( "name", "Nicolas")
+ln_person.setattribute( "age", 39)
+ln_person.setattribute( "languages", { "fr", "en" })
+ln_root.setAttribute( "person", ln_person)
+ln_root.setAttribute( "time", "07:30:18 PM")
+ln_root.setAttribute( "milliseconds_sinc_epoch", 1401910218155)
+ln_root.setAttribute( "date", now(), "dd/mm/yyyy")
+
+ln_root.setObject( ln_root )
+messageBox("JSON created from OOP", ln_root.toJson( ) )
+destroy ln_root
+destroy ln_person
 ```
+
+TODO
+====
+* Handle \u generation in toString() -> toJson() method
+* Add unquotted indentifier as object attribut name in relaxed syntax
+* Implement an Update( JSPath, value ) method
+* Implement a Delete( JSPath ) method
+* Improve documentation
+
 LICENSE
 =======
 
