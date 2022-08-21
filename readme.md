@@ -12,7 +12,7 @@ PREREQUIRE
 PB10+, the test project was tested using PB11.5 and the bootstrap-pbl.cmd 
 initialisation files is configurated for PB115, to switch to another IDE 
 version, edit this file and change the line containing "set pbver=115" by
-the appropriate value (100, 110, 115, 120, 125, 170).
+the appropriate value (100, 110, 115, 120, 125, 170, 190, ..., 220).
 
 INSTALLATION
 ============
@@ -40,34 +40,34 @@ ls_error = ln_json.parseFile('c:\fixtures\json\test-date.json')
 */
 
 //to read from string
-ls_error = ln_json.parse('{                   &
-   "time": "07:30:18 PM",                     &
-   "milliseconds_since_epoch": 1401910218155, &
-   "date": "06-04-2014",                       &
-   "person": {        &
-	    "name":  "Nicolas", &
-		 "age": 39, &
-		 "languages": [ "fr", "en" ], &
-	}       &
+ls_error = ln_json.parse('{                    &
+    "time": "07:30:18 PM",                     &
+    "milliseconds_since_epoch": 1401910218155, &
+    "date": "06-04-2014",                      &
+    "person": {                                &
+        "name":  "Nicolas",                    &
+        "age": 39,                             &
+        "languages": [ "fr", "en" ],           &
+    }                                          &
 }')
 
 //check for parse error
 if ls_error <> "" then
-	messagebox("Parse error", ls_error, stopSign!, ok!)
-	destroy ln_json
-	return
+    messagebox("Parse error", ls_error, stopSign!, ok!)
+    destroy ln_json
+    return
 end if
 
 //working with parsed data
- any la_data
- if ln_json.retrieve("date", ref la_data) then
-	  messagebox("date", string(la_data))
- end if
+any la_data
+if ln_json.retrieve("date", ref la_data) then
+    messagebox("date", string(la_data))
+end if
 
 //using XPath like expression to travers JSON structures : object with key name, array with index (1 based)
- if ln_json.retrieve("person/languages/2", ref la_data) then
-	  messagebox("Person language n#2", string(la_data))
- end if
+if ln_json.retrieve("person/languages/2", ref la_data) then
+    messagebox("Person language n#2", string(la_data))
+end if
 
 //using OOP
 la_data = ln_json.getObject().getAttribute( "date" )
@@ -76,8 +76,7 @@ messagebox("date", string(la_data))
 //then destroy parser
 destroy ln_json
 
-//TODO: add an Update method that works with an XPath-like expression to modify an element
-//			add a Delete method that works with an XPath-like expression to delete an element
+//TODO: add a Delete method that works with an XPath-like expression to delete an element
 //Build a JSON structure
 //Don't need a `ln_json.reset()` 'cause setObject will change the root
 json ln_root, ln_person, ln_languages
@@ -101,7 +100,6 @@ TODO
 ====
 * Handle \u generation in toString() -> toJson() method
 * Add unquotted indentifier as object attribut name in relaxed syntax
-* Implement an Update( JSPath, value ) method
 * Implement a Delete( JSPath ) method
 * Improve documentation
 
@@ -110,7 +108,7 @@ LICENSE
 
 The MIT License (MIT)
 
-Copyright (c) 2014 Nicolas Georges (xlat@cpan.org)
+Copyright (c) 2014, 2021, 2022 Nicolas Georges (xlat@cpan.org)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
