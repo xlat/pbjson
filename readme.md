@@ -96,6 +96,96 @@ destroy ln_root
 destroy ln_person
 ```
 
+Another example to produce JSON using OOP
+=========================================
+
+```
+json ln_root
+ln_root = create json
+ln_root.setObject( ln_root )
+ln_root.setAttribute("cooperative", 1000)
+ln_root.setAttribute("templateName", "BankStatement")
+//add an array using OOP
+json ln_ary
+ln_ary = create json
+json ln_tran1, ln_tran2, ln_tran3
+ln_tran1 = create json
+ln_tran1.setAttribute("date", "2023-05-02")
+ln_tran1.setAttribute("description", "PIX Lorem ipsum dolor sit amet")
+ln_tran1.setAttribute("amount", -100)
+ln_ary.setArrayelement( 1, ln_tran1)
+ln_tran2 = create json
+ln_tran2.setAttribute("date", "2024-01-01")
+ln_tran2.setAttribute("description", "Fatura Cartão Lorem ipsum dolor sit amet")
+ln_tran2.setAttribute("amount", 200)
+ln_ary.setArrayelement(2, ln_tran2)
+ln_tran3 = create json
+ln_tran3.setAttribute("date", "2024-01-01")
+ln_tran3.setAttribute("description", "Saldo do dia")
+ln_tran3.setAttribute("amount", 0)
+ln_ary.setArrayelement(3, ln_tran3)
+json ln_templateProps 
+ln_templateProps = create json
+ln_templateProps.setAttribute("list", ln_ary)
+json ln_user
+ln_user = create json
+ln_user.setAttribute("userName", "Fulano da Silva")
+ln_user.setAttribute("accountNumber", "619132")
+ln_user.setAttribute("emissionDate", "2024-04-25T11:22:05.354823")
+ln_user.setAttribute("period", "7 dias")
+ln_templateProps.setAttribute("user", ln_user)
+ln_root.setAttribute("templateProps", ln_templateProps)
+
+mle_target.text = ln_root.toJson()
+
+destroy ln_tran1
+destroy ln_tran2
+destroy ln_tran3
+destroy ln_templateProps
+destroy ln_user
+destroy ln_ary
+destroy ln_root
+```
+
+Same as previous example but using OOP Chainng
+==============================================
+
+Note: for this to works you need to add the following line in the very begining of your application open script: `json = create json`
+
+```
+mle_target.text = &
+JSON.NewRoot() &
+	.setAttribute("cooperative", 1000) &
+	.setAttribute("templateName", "BankStatement") &
+	.setAttribute("templateProps", JSON.NewObject() &
+		.setAttribute("list", 	JSON.NewArray() &
+			.push( JSON.NewObject() &
+							.setAttribute("date", "2023-05-02") &
+							.setAttribute("description", "PIX Lorem ipsum dolor sit amet") &
+							.setAttribute("amount", -100) &
+			) /* tran1 */ &
+			.push( JSON.NewObject() &
+							.setAttribute("date", "2024-01-01") &
+							.setAttribute("description", "Fatura Cartão Lorem ipsum dolor sit amet") &
+							.setAttribute("amount", 200) &
+			) /* tran2 */ &
+			.push( JSON.NewObject() &
+							.setAttribute("date", "2024-01-01") &
+							.setAttribute("description", "Saldo do dia") &
+							.setAttribute("amount", 0) &
+			) /* tran3 */ &
+		) /* list */ &
+		.setAttribute("user", JSON.NewObject() &
+			.setAttribute("userName", "Fulano da Silva") &
+			.setAttribute("accountNumber", "619132") &
+			.setAttribute("emissionDate", "2024-04-25T11:22:05.354823") &
+			.setAttribute("period", "7 dias") &
+		) /* user */ &
+	) /* templateProps */ &
+.toJson()
+
+```
+
 TODO
 ====
 * Handle \u generation in toString() -> toJson() method
